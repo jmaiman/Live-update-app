@@ -1,3 +1,4 @@
+
 # Abaikan fail kunci Google Sheets API
 gsheets-creds.json
 
@@ -8,3 +9,15 @@ __pycache__/
 # Abaikan fail data temp
 *.db
 *.xlsx
+
+# Abaikan fail kunci Google Sheets API
+gsheets-creds.json
+
+# Abaikan folder dan fail sementara
+__pycache__/
+*.pyc
+
+# Abaikan fail data temp
+*.db
+*.xlsx
+
