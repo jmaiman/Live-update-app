@@ -62,12 +62,24 @@ def connect_to_gsheet():
 
 # --- Mula Aplikasi Streamlit ---
 init_db()
-st.write("🔍 Email Service Account:")
+st.markdown("---")
+st.write("🔐 **Google Sheets Service Account:**")
+
 try:
-    creds_dict = json.loads(st.secrets["gsheets_creds"])
-    st.code(creds_dict["client_email"])
+    if 'gsheets_creds' in st.secrets:
+        creds_dict = json.loads(st.secrets["gsheets_creds"])
+        st.markdown(f"""
+        Salin email di bawah dan berikan akses **Editor** di Google Sheets:
+        ```
+        {creds_dict["client_email"]}
+        ```
+        """)
+    else:
+        st.warning("Google Sheets tidak dikonfigurasi di secrets.toml")
 except Exception as e:
-    st.error(f"Gagal baca secrets: {e}")
+    st.error(f"Gagal memuat maklumat Service Account: {str(e)}")
+
+st.markdown("---")
 
 st.title("Sistem Input Data Produksi")
 
@@ -145,4 +157,5 @@ if os.path.exists(EXCEL_PATH):
         )
 else:
     st.warning("❌ Tiada data untuk dimuat turun.")
+
 
