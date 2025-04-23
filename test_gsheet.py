@@ -1,18 +1,48 @@
+import streamlit as st
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
-try:
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("gsheets-creds.json", scope)
-    client = gspread.authorize(creds)
+# STEP 1: Setup credentials
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/spreadsheets",
+         "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
 
-    # Cuba buka spreadsheet
-    spreadsheet = client.open("Rekod Harian Produksi")
-    worksheet = spreadsheet.get_worksheet(0)  # Ambil worksheet pertama
+creds = Credentials.from_service_account_info(
+    st.secrets["gsheets_creds"], scopes=scope)
 
-    print("✅ Berjaya sambung ke Google Sheets.")
-    print("📄 Nama Worksheet:", worksheet.title)
+client = gspread.authorize(creds)
 
-except Exception as e:
-    print("❌ Gagal sambung ke Google Sheets:")
-    print(e)
+# STEP 2: Open sheet (ganti ID dengan ID anda)
+SHEET_ID = "1VvlcA34Odn2zLwgrIfZN2xEqqzAfQP4MO6fZIX7DU4M"
+SHEET_NAME = "Sheet1"
+
+sheet = client.open_by_key(SHEET_ID).worksheet(SHEET_NAME)
+
+# STEP 3: Uji baca data
+data = sheet.get_all_records()
+st.write("Google Sheet URL:http\\docs.google.com/spreadsheets/d/1VvlcA34Odn2zLwgrIfZN2xEqqzAfQP4MO6fZIX7DU4M/edit#gid=0")
+st.write(data) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

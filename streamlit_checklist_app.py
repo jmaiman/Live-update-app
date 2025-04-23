@@ -71,7 +71,6 @@ st.markdown("---")
 st.write("🔐 **Google Sheets Service Account:**")
 st.write("Secrets keys:", list(st.secrets.keys()))
 
-
 try:
     if "gsheets_creds" in st.secrets:
         creds_dict = st.secrets["gsheets_creds"]
