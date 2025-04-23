@@ -1,6 +1,0 @@
-streamlit
-pandas
-openpyxl
-pytz
-gspread
-oauth2client
