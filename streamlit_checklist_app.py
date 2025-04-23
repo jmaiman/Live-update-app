@@ -69,11 +69,12 @@ def connect_to_gsheet():
 init_db()
 st.markdown("---")
 st.write("🔐 **Google Sheets Service Account:**")
-st.write("🔍 Keys dalam st.secrets:", list(st.secrets.keys()))
+st.write("Secrets keys:", list(st.secrets.keys()))
+
 
 try:
-    if 'gsheets_creds' in st.secrets:
-        creds_dict = attrdict_to_dict(st.secrets["gsheets_creds"])
+    if "gsheets_creds" in st.secrets:
+        creds_dict = st.secrets["gsheets_creds"]
         st.markdown(f"""
         Salin email di bawah dan berikan akses **Editor** di Google Sheets:
         ```
@@ -162,6 +163,7 @@ if os.path.exists(EXCEL_PATH):
         )
 else:
     st.warning("❌ Tiada data untuk dimuat turun.")
+
 
 
 
