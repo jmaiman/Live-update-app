@@ -69,6 +69,7 @@ def connect_to_gsheet():
 init_db()
 st.markdown("---")
 st.write("🔐 **Google Sheets Service Account:**")
+st.write("🔍 Keys dalam st.secrets:", list(st.secrets.keys()))
 
 try:
     if 'gsheets_creds' in st.secrets:
@@ -161,6 +162,7 @@ if os.path.exists(EXCEL_PATH):
         )
 else:
     st.warning("❌ Tiada data untuk dimuat turun.")
+
 
 
 
