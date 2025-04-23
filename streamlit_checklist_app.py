@@ -4,10 +4,9 @@ import pandas as pd
 import os
 from datetime import datetime
 import pytz
-from io import BytesIO
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-import json
+from collections.abc import Mapping
 
 # --- KONFIGURASI ---
 DB_PATH = os.path.join("Daily Result", "rekod_harian.db")
@@ -18,6 +17,13 @@ os.makedirs("Daily Result", exist_ok=True)
 # --- Fungsi Waktu Malaysia ---
 def get_malaysia_time():
     return datetime.now(pytz.timezone('Asia/Kuala_Lumpur'))
+
+# --- Convert AttrDict ke dict biasa ---
+def attrdict_to_dict(d):
+    if isinstance(d, Mapping):
+        return {k: attrdict_to_dict(v) for k, v in d.items()}
+    else:
+        return d
 
 # --- Initialize Database SQLite ---
 def init_db():
@@ -40,15 +46,14 @@ def init_db():
     conn.commit()
     conn.close()
 
-# --- Sambung ke Google Sheets (dengan error handling) ---
+# --- Sambung ke Google Sheets ---
 def connect_to_gsheet():
     try:
-        # Dapatkan credentials dari secret
-        creds_dict = json.loads(st.secrets["gsheets_creds"])
+        creds_dict = attrdict_to_dict(st.secrets["gsheets_creds"])
         credentials = ServiceAccountCredentials.from_json_keyfile_dict(
             creds_dict,
             scopes=["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-)
+        )
         client = gspread.authorize(credentials)
         spreadsheet = client.open("Rekod Harian Produksi")
         worksheet = spreadsheet.get_worksheet(0)
@@ -67,7 +72,7 @@ st.write("🔐 **Google Sheets Service Account:**")
 
 try:
     if 'gsheets_creds' in st.secrets:
-        creds_dict = json.loads(st.secrets["gsheets_creds"])
+        creds_dict = attrdict_to_dict(st.secrets["gsheets_creds"])
         st.markdown(f"""
         Salin email di bawah dan berikan akses **Editor** di Google Sheets:
         ```
@@ -80,7 +85,6 @@ except Exception as e:
     st.error(f"Gagal memuat maklumat Service Account: {str(e)}")
 
 st.markdown("---")
-
 st.title("Sistem Input Data Produksi")
 
 with st.form("production_form"):
@@ -100,7 +104,7 @@ with st.form("production_form"):
         try:
             waktu = get_malaysia_time()
 
-            # [1] Simpan ke SQLite
+            # Simpan ke SQLite
             conn = sqlite3.connect(DB_PATH)
             cursor = conn.cursor()
             cursor.execute(
@@ -117,11 +121,11 @@ with st.form("production_form"):
             )
             conn.commit()
 
-            # [2] Simpan ke Excel
+            # Simpan ke Excel
             df = pd.read_sql_query(f"SELECT * FROM {TABLE_NAME}", conn)
             df.to_excel(EXCEL_PATH, index=False)
 
-            # [3] Simpan ke Google Sheets
+            # Simpan ke Google Sheets
             sheet = connect_to_gsheet()
             if sheet:
                 try:
@@ -157,5 +161,6 @@ if os.path.exists(EXCEL_PATH):
         )
 else:
     st.warning("❌ Tiada data untuk dimuat turun.")
+
 
 
